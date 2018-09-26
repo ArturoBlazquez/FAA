@@ -5,7 +5,6 @@ import numpy as np
 class Datos(object):
     TiposDeAtributos = ('Continuo', 'Nominal')
 
-    #TODO: ver lo de las líneas
     def __init__(self, nombre_fichero):
         with open(nombre_fichero) as f:
             lines = f.readlines()
@@ -24,24 +23,19 @@ class Datos(object):
             datos_sin_procesar = np.array([line.strip().split(',') for line in lines[3:]])
 
             self.diccionarios = []
-            self.datos = np.empty((int(lines[0].strip()), len(self.nombreAtributos)))
+            self.datos = np.zeros((int(lines[0].strip()), len(self.nombreAtributos)), dtype=int)
 
             for i, nominal in enumerate(self.nominalAtributos):
                 if nominal:
                     nombres_de_atributos = sorted(set(datos_sin_procesar[:, i]))
                     self.diccionarios.append({v: k for k, v in enumerate(nombres_de_atributos)})
 
-                    print(len([self.diccionarios[-1][data] for data in datos_sin_procesar[:, i]]), len(self.datos))
-                    print(self.datos)
-
-                    np.append(self.datos, [self.diccionarios[-1][data] for data in datos_sin_procesar[:, i]], axis=1)
+                    self.datos[:, i] = [self.diccionarios[-1][data] for data in datos_sin_procesar[:, i]]
                 else:
                     self.diccionarios.append({})
-                    np.append(self.datos, datos_sin_procesar[:, i], axis=1)
 
-
-
+                    self.datos[:, i] = datos_sin_procesar[:, i]
 
     # TODO: implementar en la práctica 1
-    def extraeDatos(idx):
+    def extrae_datos(self, idx):
         pass
