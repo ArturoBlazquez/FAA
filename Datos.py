@@ -32,7 +32,7 @@ class Datos(object):
             datos_sin_procesar = np.array([line.strip().split(',') for line in lines[3:]])
 
             self.diccionarios = []
-            self.datos = np.zeros((int(lines[0].strip()), len(self.nombreAtributos)), dtype=int)
+            self.datos = np.zeros((int(lines[0].strip()), len(self.nombreAtributos)), dtype=float)
 
             for i, nominal in enumerate(self.nominalAtributos):
                 if nominal:
