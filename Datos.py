@@ -5,6 +5,10 @@ import numpy as np
 class Datos(object):
     TiposDeAtributos = ('Continuo', 'Nominal')
 
+    ERROR_TIPO_NO_CONTINUO_NI_NOMINAL = 'Hay datos que no son {0[0]} ni {0[1]}'.format(TiposDeAtributos)
+    ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS = 'No coincide el número de atributos en las filas 2 y 3'
+    ERROR_DIFERENTE_NUMERO_DATOS = "No coincide el número de datos de la línea 1 con el número de datos reales"
+
     def __init__(self, nombre_fichero):
         with open(nombre_fichero) as f:
             lines = f.readlines()
@@ -12,11 +16,16 @@ class Datos(object):
             self.nombreAtributos = lines[1].strip().split(',')
             self.tipoAtributos = lines[2].strip().split(',')
 
+            # Comprobación de errores:
             if set(self.tipoAtributos).difference(set(self.TiposDeAtributos)):
-                raise ValueError('Hay datos que no son {0[0]} ni {0[1]}'.format(self.TiposDeAtributos))
+                raise ValueError(Datos.ERROR_TIPO_NO_CONTINUO_NI_NOMINAL)
 
             if len(self.nombreAtributos) != len(self.tipoAtributos):
-                raise ValueError('No coincide el número de atributos en las filas 2 y 3')
+                raise ValueError(Datos.ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS)
+
+            if len(lines[3:]) != int(lines[0]):
+                raise ValueError(Datos.ERROR_DIFERENTE_NUMERO_DATOS)
+            # End comprobación de errores
 
             self.nominalAtributos = np.array(self.tipoAtributos) == "Nominal"
 
