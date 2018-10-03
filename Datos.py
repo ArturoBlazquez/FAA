@@ -46,5 +46,5 @@ class Datos(object):
                     self.datos[:, i] = datos_sin_procesar[:, i]
 
     # TODO: implementar en la práctica 1
-    def extrae_datos(self, idx):
-        pass
+    def extrae_datos(self, indices):
+        return self.datos[indices, :]
