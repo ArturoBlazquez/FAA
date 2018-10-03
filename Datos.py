@@ -18,13 +18,13 @@ class Datos(object):
 
             # Comprobación de errores:
             if set(self.tipoAtributos).difference(set(self.TiposDeAtributos)):
-                raise ValueError(Datos.ERROR_TIPO_NO_CONTINUO_NI_NOMINAL)
+                raise ValueError(self.ERROR_TIPO_NO_CONTINUO_NI_NOMINAL)
 
             if len(self.nombreAtributos) != len(self.tipoAtributos):
-                raise ValueError(Datos.ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS)
+                raise ValueError(self.ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS)
 
             if len(lines[3:]) != int(lines[0]):
-                raise ValueError(Datos.ERROR_DIFERENTE_NUMERO_DATOS)
+                raise ValueError(self.ERROR_DIFERENTE_NUMERO_DATOS)
             # End comprobación de errores
 
             self.nominalAtributos = np.array(self.tipoAtributos) == "Nominal"

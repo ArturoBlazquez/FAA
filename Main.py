@@ -14,16 +14,16 @@ class DatosTest(unittest.TestCase):
         self.assertIsInstance(german, Datos)
 
         with self.assertRaisesRegex(ValueError, Datos.ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS):
-            Datos('ConjuntosDatos/diferente_numero_atributos_y_tipos.data')
+            Datos('ConjuntosDatos/unitTests/diferente_numero_atributos_y_tipos.data')
 
         with self.assertRaisesRegex(ValueError, Datos.ERROR_DIFERENTE_NUMERO_DATOS):
-            Datos('ConjuntosDatos/diferente_numero_datos.data')
+            Datos('ConjuntosDatos/unitTests/diferente_numero_datos.data')
 
         with self.assertRaisesRegex(ValueError, Datos.ERROR_TIPO_NO_CONTINUO_NI_NOMINAL):
-            Datos('ConjuntosDatos/tipo_atributos_no_continuo_ni_nominal.data')
+            Datos('ConjuntosDatos/unitTests/tipo_atributos_no_continuo_ni_nominal.data')
 
         with self.assertRaises(FileNotFoundError):
-            Datos('ConjuntosDatos/no_existe.data')
+            Datos('ConjuntosDatos/unitTests/no_existe.data')
 
 
 if __name__ == '__main__':
