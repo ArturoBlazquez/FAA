@@ -7,5 +7,5 @@ class EstrategiaParticionado(metaclass=ABCMeta):
     particiones = []
 
     @abstractmethod
-    def crea_particiones(self):
+    def creaParticiones(self):
         pass

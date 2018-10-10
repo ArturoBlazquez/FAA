@@ -2,5 +2,5 @@ import EstrategiaParticionado
 
 
 class ValidacionCruzada(EstrategiaParticionado):
-    def crea_particiones(self):
+    def creaParticiones(self):
         return

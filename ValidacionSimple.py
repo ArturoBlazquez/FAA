@@ -4,5 +4,5 @@ import EstrategiaParticionado
 
 
 class ValidacionSimple(EstrategiaParticionado):
-    def crea_particiones(self):
+    def creaParticiones(self):
         return

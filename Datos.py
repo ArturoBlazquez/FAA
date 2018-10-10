@@ -9,8 +9,8 @@ class Datos(object):
     ERROR_DIFERENTE_NUMERO_ATRIBUTOS_Y_TIPOS = 'No coincide el número de atributos en las filas 2 y 3'
     ERROR_DIFERENTE_NUMERO_DATOS = "No coincide el número de datos de la línea 1 con el número de datos reales"
 
-    def __init__(self, nombre_fichero):
-        with open(nombre_fichero) as f:
+    def __init__(self, nombreFichero):
+        with open(nombreFichero) as f:
             lines = f.readlines()
 
             self.nombreAtributos = lines[1].strip().split(',')
@@ -46,5 +46,5 @@ class Datos(object):
                     self.datos[:, i] = datos_sin_procesar[:, i]
 
     # TODO: implementar en la práctica 1
-    def extrae_datos(self, indices):
+    def extraeDatos(self, indices):
         return self.datos[indices, :]

@@ -2,5 +2,5 @@ import EstrategiaParticionado
 
 
 class ValidacionBootstrap(EstrategiaParticionado):
-    def crea_particiones(self):
+    def creaParticiones(self):
         return
