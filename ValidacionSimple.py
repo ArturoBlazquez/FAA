@@ -4,7 +4,7 @@ import EstrategiaParticionado
 import numpy as np
 from Particion import Particion
 
-
+# TODO: implementar el crearParticiones con np.random.choice (y ordenado)
 class ValidacionSimple(EstrategiaParticionado):
 
 
