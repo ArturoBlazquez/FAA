@@ -15,6 +15,19 @@ TODO:
         - Luego cada clasificador tiene sus propios métodos
       
       - Tenemos 4 semanas para hacer toda esta movida
+      
+      Crear modelo:
+      discreto -> en NB el modelo es el conjunto de probabilidades de las clases, etc. Entrenamiento hace las tablas
+      continuo -> Calcular media y desviación al entrenar.
+      
+      Clasifica:
+        - Uso las tablas
+      
+      Error:
+        Compara la clase que nos da clasifica con la real
+        
+      Corrección de Laplace:
+        Vamos a ver si tiene algún efecto sobre los conjuntos qu estamos analizando
 """
 
 

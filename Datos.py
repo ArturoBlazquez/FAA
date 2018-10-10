@@ -48,3 +48,4 @@ class Datos(object):
     # TODO: implementar en la práctica 1
     def extraeDatos(self, indices):
         return self.datos[indices, :]
+        #Ver lo de las filas repetidas
