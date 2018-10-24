@@ -8,7 +8,7 @@ class EstrategiaParticionado(metaclass=ABCMeta):
         self.numero_particiones = 0
         self.particiones = []
     
-    # TODO: ver los argumentos que se pasan
+    # TODO: control de errores si pasas porcentaje negativo o 150% o número de folds raros
     @abstractmethod
-    def creaParticiones(self):
+    def creaParticiones(self, data):
         pass
