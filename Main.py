@@ -28,6 +28,13 @@ TODO:
         
       Corrección de Laplace:
         Vamos a ver si tiene algún efecto sobre los conjuntos que estamos analizando
+        
+        
+        Para la parte 3 podemos hacer sciky.py o hacer un clasificador clasificadorsci.py
+        
+        
+        
+      Entregar: Datos, clasificador, estartegiaparticion, clasificadornb
 """
 
 
