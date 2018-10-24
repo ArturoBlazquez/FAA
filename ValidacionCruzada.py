@@ -5,7 +5,6 @@ from Particion import Particion
 
 
 class ValidacionCruzada(EstrategiaParticionado):
-    
     def __init__(self, folds):
         super().__init__()
         self.nombre_estrategia = "Validación cruzada"

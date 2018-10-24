@@ -5,7 +5,6 @@ from Particion import Particion
 
 
 class ValidacionSimple(EstrategiaParticionado):
-    
     def __init__(self, porcentajeTrain):
         super().__init__()
         self.porcentajeTrain = porcentajeTrain
