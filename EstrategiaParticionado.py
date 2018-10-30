@@ -9,6 +9,8 @@ class EstrategiaParticionado(metaclass=ABCMeta):
     
     # TODO: control de errores si pasas porcentaje negativo o 150% o número de folds raros
     # TODO: meter la seed
+    # TODO: al llamar a validación varias veces se quedan acumulados los valores previos. Probablemente haya que hacer
+    #  un self.particiones = [] al empezar creaParticiones
     @abstractmethod
     def creaParticiones(self, data):
         pass
