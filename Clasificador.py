@@ -1,3 +1,4 @@
+import numpy as np
 from abc import ABCMeta, abstractmethod
 
 
@@ -14,28 +15,20 @@ class Clasificador(metaclass=ABCMeta):
         pass
     
     def error(self, datos, pred):
-        aciertos = 0
-        fallos = 0
-        
-        for is_acierto in (datos[:, -1] == pred):
-            if is_acierto:
-                aciertos += 1
-            else:
-                fallos += 1
-        
-        return aciertos, fallos
+        return datos[:, -1] != pred
     
     def validacion(self, particionado, dataset, clasificador, seed=None):
         particionado.creaParticiones(dataset.datos)
-        
+
+        errores= []
+
         for particion in particionado.particiones:
             atributosDiscretos = dataset.nominalAtributos
             diccionario = dataset.diccionarios
-            
+
             clasificador.entrenamiento(dataset.extraeDatos(particion.indicesTrain), atributosDiscretos, diccionario)
             pred = clasificador.clasifica(dataset.extraeDatos(particion.indicesTest), atributosDiscretos, diccionario)
-            
-            aciertos, fallos = self.error(dataset.extraeDatos(particion.indicesTest), pred)
-            
-            print(aciertos * 100 / (aciertos + fallos), "% de aciertos", sep='')
-            print(fallos * 100 / (aciertos + fallos), "% de fallos", sep='')
+
+            errores.append(self.error(dataset.extraeDatos(particion.indicesTest), pred))
+
+        return np.array(errores).flatten()
