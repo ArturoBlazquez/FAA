@@ -1,90 +1,49 @@
-from sklearn.naive_bayes import GaussianNB, MultinomialNB, preprocessing
+import itertools
 
-# TODO: quitar todo lo copiado de ClasificadorNaiveBayes que no corresponda a SK
-# Encode categorical integer features using a one-hot aka one-of-K scheme (categorical features)
-encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1],sparse=False)
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split, KFold
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from Datos import Datos
+
+# Los datos a analizar con SKlearn son german.data y tic-tac-toe.data
+dataset = Datos('ConjuntosDatos/german.data')
+
+# Encode categorical integer features using a one-hot aka one-of-K scheme (categorical features). Hay DeprecationWarnings
+encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1], sparse=False)
 X = encAtributos.fit_transform(dataset.datos[:,:-1])
-Y = dataset.datos[:,-1]
+
+# Clases correspondientes a cada uno de los array de X
+y = dataset.datos[:,-1]
 
 
-import numpy as np
+# particiones --> entrenamiento (fit) --> clasificar (predict) --> error
+# Particiones del modo Validacion Simple
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-from Clasificador import Clasificador
+# Entrenamiento y clasificacion de X_test
+gnb = GaussianNB()
+y_pred = gnb.fit(X_train, y_train).predict(X_test)
 
+errores = y_pred != y_test
+tasa_de_error = sum(errores)/len(errores)
 
-class ClasificadorNaiveBayesSK(Clasificador):
-    def __init__(self):
-        super().__init__()
-        self.tables = []
-
-    def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, aplicar_correccion_de_laplace=True):
-# TODO: separar los datosTrain en 2 tablas: una con los atributos continuos + la clase, y la otra con los atributos discretos + la clase
-# a la primera tabla aplicarle GaussianNB.fit
-# a la segunda tabla aplicarle MultinomialNB.fit
-
-        for i, is_discreto in enumerate(atributosDiscretos[:]):
-            if is_discreto:
-                table = np.zeros((len(diccionario[i]), len(diccionario[-1])))
-                multinomialNB = MultinomialNB(1,True)
-                multinomialNB.fit(
-
-                #for data in datosTrain:
-                #    table[int(data[i]), int(data[-1])] += 1
-
-                if i < len(atributosDiscretos) - 1:
-                    if aplicar_correccion_de_laplace and has_any_zeros(table):
-                        table = table + 1
-
-                    for column in np.transpose(table):
-                        column /= sum(column)
-
-                self.tables.append(table)
-
-            else:
-                table = np.zeros((2, len(diccionario[-1])))
-                datos_agrupados = [[] for i in range(len(diccionario[-1]))]
-
-                for data in datosTrain:
-                    datos_agrupados[int(data[-1])].append(data[i])
-
-                for j, grupo in enumerate(datos_agrupados):
-                    mean = np.mean(grupo)
-                    var = np.var(grupo)
-                    table[:, j] = [mean, var]
-
-                self.tables.append(table)
-
-    # TODO: Falta hacer alguna prueba para ver si de verdad está bien. Creo que sí
-    def clasifica(self, datosTest, atributosDiscretos, diccionario):
-
-        clasificacion = []
-
-        for row in datosTest:
-            probabilidades = []
-
-            for clase in range(len(diccionario[-1])):
-                prob = 1
-                for i, is_discreto in enumerate(atributosDiscretos[:]):
-                    if i < len(atributosDiscretos) - 1:
-                        atrib_table = self.tables[i]
-                        data = int(row[i])
-
-                        if is_discreto:
-                            prob *= atrib_table[data, clase]
-                        else:
-                            mean = atrib_table[0, clase]
-                            var = atrib_table[1, clase]
-                            prob *= (1 / math.sqrt(2 * math.pi * var)) * math.exp((-(data - mean) ** 2) / (2 * var))
-                    else:
-                        prob *= self.tables[i][clase, clase]
-
-                probabilidades.append(prob)
-
-            clasificacion.append(probabilidades.index(max(probabilidades)))
-
-        return np.array(clasificacion)
+print(tasa_de_error)
 
 
-def has_any_zeros(table):
-    return np.size(table) - np.count_nonzero(table) != 0
+# Particiones del modo Validacion Cruzada
+# KFold(n_splits=’warn’, shuffle=False, random_state=None)
 
+kf = KFold(n_splits=6, shuffle=True)
+
+errores=[]
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+
+    y_pred = gnb.fit(X_train, y_train).predict(X_test)
+
+    errores.append(y_pred != y_test)
+
+errores = list(itertools.chain.from_iterable(errores))
+tasa_de_error = sum(errores) / len(errores)
+print(tasa_de_error)
