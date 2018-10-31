@@ -2,41 +2,6 @@ import unittest
 
 from Datos import Datos
 
-"""
-TODO:
-      - Dos clases: clasificadores y particionado
-      - Particionado guarda una lista de particiones
-        - Partición guarda sólo los índices y no los datos como tal
-        - Extrae datos de una lista de índices me devuelve la matriz correspondiente
-      - Entrenadores:
-        - error y validación son métodos generales
-          - Validación extrae los datos de train y luego extrae los datos de test y clasifica.
-            Luego llama al error y calcula la tasa.
-        - Luego cada clasificador tiene sus propios métodos
-      
-      - Tenemos 4 semanas para hacer toda esta movida
-      
-      Crear modelo:
-      discreto -> en NB el modelo es el conjunto de probabilidades de las clases, etc. Entrenamiento hace las tablas
-      continuo -> Calcular media y desviación al entrenar.
-      
-      Clasifica:
-        - Uso las tablas
-      
-      Error:
-        Compara la clase que nos da clasifica con la real
-        
-      Corrección de Laplace:
-        Vamos a ver si tiene algún efecto sobre los conjuntos que estamos analizando
-        
-        
-        Para la parte 3 podemos hacer sciky.py o hacer un clasificador clasificadorsci.py
-        
-        
-        
-      Entregar: Datos, clasificador, estartegiaparticion, clasificadornb
-"""
-
 
 class DatosTest(unittest.TestCase):
     def test_datos_init(self):

@@ -11,6 +11,8 @@ class ClasificadorNaiveBayes(Clasificador):
         self.tables = []
     
     def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, aplicar_correccion_de_laplace=True):
+        self.tables = []
+        
         for i, is_discreto in enumerate(atributosDiscretos[:]):
             if is_discreto:
                 table = np.zeros((len(diccionario[i]), len(diccionario[-1])))
@@ -41,7 +43,6 @@ class ClasificadorNaiveBayes(Clasificador):
                 
                 self.tables.append(table)
     
-    # TODO: Falta hacer alguna prueba para ver si de verdad está bien. Creo que sí
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
         
         clasificacion = []

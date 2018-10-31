@@ -1,4 +1,5 @@
-import numpy as np
+import itertools
+
 from abc import ABCMeta, abstractmethod
 
 
@@ -17,18 +18,24 @@ class Clasificador(metaclass=ABCMeta):
     def error(self, datos, pred):
         return datos[:, -1] != pred
     
-    def validacion(self, particionado, dataset, clasificador, seed=None):
+    def validacion(self, particionado, dataset, clasificador, seed=None, aplicar_correccion_de_laplace=True):
         particionado.creaParticiones(dataset.datos)
-
-        errores= []
-
+        
+        errores = []
+        
         for particion in particionado.particiones:
+            datos_train = dataset.extraeDatos(particion.indicesTrain)
+            datos_test = dataset.extraeDatos(particion.indicesTest)
             atributosDiscretos = dataset.nominalAtributos
             diccionario = dataset.diccionarios
-
-            clasificador.entrenamiento(dataset.extraeDatos(particion.indicesTrain), atributosDiscretos, diccionario)
-            pred = clasificador.clasifica(dataset.extraeDatos(particion.indicesTest), atributosDiscretos, diccionario)
-
-            errores.append(self.error(dataset.extraeDatos(particion.indicesTest), pred))
-
-        return np.array(errores).flatten()
+            
+            clasificador.entrenamiento(datos_train, atributosDiscretos, diccionario, aplicar_correccion_de_laplace)
+            pred = clasificador.clasifica(datos_test, atributosDiscretos, diccionario)
+            
+            errores.append(self.error(datos_test, pred))
+        
+        errores = list(itertools.chain.from_iterable(errores))
+        
+        tasa_de_error = sum(errores) / len(errores)
+        
+        return errores, tasa_de_error

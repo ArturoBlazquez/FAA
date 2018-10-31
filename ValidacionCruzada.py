@@ -11,6 +11,11 @@ class ValidacionCruzada(EstrategiaParticionado):
         self.numero_particiones = folds
     
     def creaParticiones(self, data):
+        if self.numero_particiones > len(data):
+            raise ValueError("Hay más folds que datos")
+        
+        self.particiones = []
+        
         indices = np.arange(len(data))
         np.random.shuffle(indices)
         indices_particiones = split(indices, self.numero_particiones)
@@ -23,12 +28,5 @@ class ValidacionCruzada(EstrategiaParticionado):
 
 
 def split(seq, num):
-    avg = len(seq) / float(num)
-    out = []
-    last = 0.0
-    
-    while last < len(seq):
-        out.append(seq[int(last):int(last + avg)])
-        last += avg
-    
-    return out
+    k, m = divmod(len(seq), num)
+    return (seq[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(num))
