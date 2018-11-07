@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from Clasificador import Clasificador
+from P1.Clasificador import Clasificador
 
 
 class ClasificadorNaiveBayes(Clasificador):
