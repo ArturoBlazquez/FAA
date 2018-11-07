@@ -1,7 +1,7 @@
 import numpy as np
 
-from P1.EstrategiaParticionado import EstrategiaParticionado
-from P1.Particion import Particion
+from EstrategiaParticionado import EstrategiaParticionado
+from Particion import Particion
 
 
 class ValidacionSimple(EstrategiaParticionado):
