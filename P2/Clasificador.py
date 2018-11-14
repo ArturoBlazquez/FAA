@@ -1,8 +1,6 @@
 import itertools
 from abc import ABCMeta, abstractmethod
 
-import numpy as np
-
 
 class Clasificador(metaclass=ABCMeta):
     def __init__(self):
@@ -40,20 +38,3 @@ class Clasificador(metaclass=ABCMeta):
         tasa_de_error = sum(errores) / len(errores)
         
         return errores, tasa_de_error
-    
-    def calcularMediasDesv(self, datos_train, atributosDiscretos):
-        medias = []
-        desviaciones = []
-        for i, is_discreto in enumerate(atributosDiscretos):
-            if is_discreto:
-                medias.append(0)
-                desviaciones.append(1)
-            else:
-                medias.append(np.mean(datos_train[:, i]))
-                desviaciones.append(np.std(datos_train[:, i]))
-        
-        return medias, desviaciones
-    
-    def normalizarDatos(self, datos, medias, desviaciones):
-        np.ndarray()
-    
