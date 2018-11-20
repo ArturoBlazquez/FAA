@@ -16,8 +16,15 @@ class ClasificadorVecinosProximos(Clasificador):
     def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, normalizar_datos=True):
         self.__init__(self.k)
         
-        self.medias, self.desviaciones = calcularMediasDesv(datosTrain, atributosDiscretos)
-        self.datos = normalizarDatos(datosTrain, self.medias, self.desviaciones)
+        if normalizar_datos:
+            self.medias, self.desviaciones = calcularMediasDesv(datosTrain[:, :-1], atributosDiscretos[:-1])
+            datos = normalizarDatos(datosTrain[:, :-1], self.medias, self.desviaciones)
+            
+            self.datos = np.column_stack((datos, datosTrain[:, -1]))
+        else:
+            self.medias = [0 for _ in atributosDiscretos]
+            self.desviaciones = [1 for _ in atributosDiscretos]
+            self.datos = datosTrain
     
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
         datos_a_clasificar = normalizarDatos(datosTest, self.medias, self.desviaciones)
@@ -27,10 +34,10 @@ class ClasificadorVecinosProximos(Clasificador):
         for dato_a_clasificar in datos_a_clasificar:
             distancias = []
             for dato in self.datos:
-                d = calcular_distancia(dato_a_clasificar[:-1], dato[:-1], atributosDiscretos[:-1])
+                d = calcular_distancia(dato_a_clasificar, dato[:-1], atributosDiscretos[:-1])
                 distancias.append(d)
             
-            indices_vecinos = np.argsort(distancias)[:self.k]
+            indices_vecinos = np.argpartition(distancias, self.k)[:self.k]
             
             clase_vecinos = self.datos[indices_vecinos, -1]
             
@@ -57,7 +64,7 @@ def calcular_distancia(dato1, dato2, atributosDiscretos):
 def clase_mas_frecuente(lst):
     (values, counts) = np.unique(lst, return_counts=True)
     ind = np.argmax(counts)
-    return values[ind]  # prints the most frequent element
+    return values[ind]
 
 
 def calcularMediasDesv(datos_train, atributosDiscretos):

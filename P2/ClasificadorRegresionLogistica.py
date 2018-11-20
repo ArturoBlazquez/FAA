@@ -4,13 +4,12 @@ from scipy.special import expit as sigmoidal
 from Clasificador import Clasificador
 
 
-# TODO: Volver a comprobar que esto está bien
 class ClasificadorRegresionLogistica(Clasificador):
     def __init__(self):
         super().__init__()
         self.w = []
     
-    def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, nepocas=1, const=1):
+    def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, nepocas=10, const=0.78):
         self.__init__()
         
         w = np.random.uniform(-0.5, 0.5, len(atributosDiscretos))
@@ -28,12 +27,12 @@ class ClasificadorRegresionLogistica(Clasificador):
         clasificacion = []
         
         for dato in datosTest:
-            x = np.append(1, dato[:-1])
+            x = np.append(1, dato)
             a = np.matmul(self.w, x)
             
             if a > 0:
-                clasificacion.append(0.0)
-            else:
                 clasificacion.append(1.0)
+            else:
+                clasificacion.append(0.0)
         
         return np.array(clasificacion)
