@@ -17,7 +17,7 @@ class Clasificador(metaclass=ABCMeta):
     def error(self, datos, pred):
         return datos[:, -1] != pred
     
-    def validacion(self, particionado, dataset, clasificador, seed=None, normalizar_datos=None, nepocas=None):
+    def validacion(self, particionado, dataset, clasificador, seed=None, normalizar_datos=None, nepocas=None, const=None):
         particionado.creaParticiones(dataset.datos)
         
         errores = []
@@ -31,7 +31,7 @@ class Clasificador(metaclass=ABCMeta):
             if normalizar_datos is not None:
                 clasificador.entrenamiento(datos_train, atributosDiscretos, diccionario, normalizar_datos)
             elif nepocas is not None:
-                clasificador.entrenamiento(datos_train, atributosDiscretos, diccionario, nepocas)
+                clasificador.entrenamiento(datos_train, atributosDiscretos, diccionario, nepocas, const)
             else:
                 clasificador.entrenamiento(datos_train, atributosDiscretos, diccionario)
             

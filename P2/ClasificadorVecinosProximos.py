@@ -22,8 +22,8 @@ class ClasificadorVecinosProximos(Clasificador):
             
             self.datos = np.column_stack((datos, datosTrain[:, -1]))
         else:
-            self.medias = [0 for _ in atributosDiscretos]
-            self.desviaciones = [1 for _ in atributosDiscretos]
+            self.medias = [0] * (len(atributosDiscretos) - 1)
+            self.desviaciones = [1] * (len(atributosDiscretos) - 1)
             self.datos = datosTrain
     
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
