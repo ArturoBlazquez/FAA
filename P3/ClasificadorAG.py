@@ -16,36 +16,52 @@ MUTACION_PORCENTAJE_DE_INDIVIDUOS = 1
 
 
 class ClasificadorAG(Clasificador):
-    def __init__(self, k):
+    def __init__(self, k=0):
         self.k = k
+        self.individuo = []
+        self.stats = []
         super().__init__()
     
     def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, num_individuos=100, min_reglas=1,
-                      max_reglas=100, representacion=REPRESENTACION_ENTERA, num_generaciones=100,
-                      tipo_cruce=CRUCE_INTER_REGLAS, tipo_mutacion=MUTACION_SIMPLE, prob_mutacion=0.01):
+                      max_reglas=4, representacion=REPRESENTACION_ENTERA, tasa_ceros=0.9, num_generaciones=100,
+                      tipo_cruce=CRUCE_INTER_REGLAS, tipo_mutacion=MUTACION_SIMPLE, prob_mutacion=0.001):
         k = int(1 + 3.322 * log10(len(datosTrain)))
         self.__init__(k)
         num_atributos = len(atributosDiscretos) - 1
-        apriori = max(set(datosTrain[-1]), key=datosTrain[-1].count)
+        apriori = clase_mas_frecuente(datosTrain[:, -1])
         
-        individuos = genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion)
+        individuos = genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion,
+                                              tasa_ceros)
         
         for i in range(num_generaciones):
             fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
+            self.update_stats(individuos, fitness)
             
             hijos = recombinacion(individuos, fitness, tipo_cruce)
             
             mutacion(hijos, prob_mutacion, k, representacion, tipo_mutacion)
             
             individuos = seleccion_de_supervivientes(individuos, hijos)
+        
+        fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
+        self.update_stats(individuos, fitness)
+        self.stats.append(calcula_fitness([[]], datosTrain, representacion, apriori)[0])  # Append apriori fitness
+        
+        self.individuo = self.stats[-2][1]
     
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
         clasificacion = []
         
         return np.array(clasificacion)
+    
+    def update_stats(self, individuos, fitness):
+        mejor_individuo = individuos[fitness.index(max(fitness))]
+        fitness_medio = sum(fitness) / len(individuos)
+        
+        self.stats.append([fitness_medio, mejor_individuo, max(fitness)])
 
 
-def genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion):
+def genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion, tasa_ceros):
     individuos = []
     
     for i in range(num_individuos):
@@ -58,6 +74,8 @@ def genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atribut
             elif representacion == REPRESENTACION_BINARIA:
                 regla = [getrandbits(k) for _ in range(num_atributos)] + [randint(0, 1)]
             
+            while regla.count(0) / num_atributos < tasa_ceros:
+                regla[randint(0, num_atributos)] = 0
             individuo.append(regla)
         
         individuos.append(individuo)
@@ -66,23 +84,17 @@ def genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atribut
 
 
 def discretiza(datos, k):
-    datos_discretos = np.empty_like(datos)
+    datos_discretos = np.copy(datos)
     
-    for j in range(datos.shape[1]):
+    for j in range(datos.shape[1] - 1):
         x_min = min(datos[:, j])
         x_max = max(datos[:, j])
         
         a = (x_max - x_min) / k
         
         for i in range(datos.shape[0]):
-            
-            x_0 = x_min
-            for intervalo in range(1, k + 1):
-                if x_0 <= datos[i, j] <= x_0 + a:
-                    datos_discretos[i, j] = intervalo
-                    break
-                else:
-                    x_0 = x_0 + a
+            intervalo = datos[i, j] // a
+            datos_discretos[i, j] = np.clip(intervalo, 1, k)
     
     return datos_discretos
 
@@ -97,7 +109,14 @@ def calcula_fitness(individuos, datos, representacion, apriori):
                 aciertos += 1
         fitness.append(aciertos)
     
-    return fitness
+    # Si el fitness de TODOS los individuos es 0, asignamos un valor positivo para poder hacer cruces
+    if max(fitness) == 0:
+        for i in range(len(fitness)):
+            fitness[i] = 1
+    
+    # Devolvemos la tasa de aciertos
+    num_datos = len(datos)
+    return [f / num_datos for f in fitness]
 
 
 def devuelve_clase(individuo, dato, representacion, apriori):
@@ -125,7 +144,7 @@ def devuelve_clase_regla(regla, dato, representacion):
         return regla[-1]
     elif representacion == REPRESENTACION_BINARIA:
         for i, gen in enumerate(regla[:-1]):
-            if gen != 0 and (gen & dato[i]) != dato[i]:
+            if gen != 0 and (gen & int(dato[i])) != dato[i]:
                 return
         return regla[-1]
 
@@ -181,11 +200,19 @@ def mutacion(individuos, prob_mutacion, k, representacion, tipo_mutacion):
             for r, regla in enumerate(individuo):
                 for g, gen in enumerate(regla):
                     if random() < prob_mutacion:
-                        if representacion == REPRESENTACION_ENTERA:
+                        if g == len(regla) - 1:
+                            individuos[i][r][g] = randint(0, 1)
+                        elif representacion == REPRESENTACION_ENTERA:
                             individuos[i][r][g] = randint(0, k)
                         elif representacion == REPRESENTACION_BINARIA:
                             individuos[i][r][g] = getrandbits(k)
 
 
 def seleccion_de_supervivientes(individuos, hijos):
-    return individuos[:2] + hijos[2:]
+    return individuos[:10] + hijos[10:]
+
+
+def clase_mas_frecuente(lst):
+    (values, counts) = np.unique(lst, return_counts=True)
+    ind = np.argmax(counts)
+    return values[ind]
