@@ -21,7 +21,7 @@ class ClasificadorAG(Clasificador):
         self.mejor_individuo = []
         self.mejores_individuos = []
         self.stats = []
-        self.fitness_apriori = []
+        self.fitness_apriori = 0
         self.representacion = 0
         self.apriori = 0
         super().__init__()
@@ -37,7 +37,7 @@ class ClasificadorAG(Clasificador):
         individuos = genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion,
                                               tasa_ceros)
         
-        print("Generación:", end=' ')
+        # print("Generación:", end=' ')
         for i in range(num_generaciones):
             fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
             self.update_stats(individuos, fitness)
@@ -48,13 +48,13 @@ class ClasificadorAG(Clasificador):
             
             individuos = seleccion_de_supervivientes(individuos, hijos, fitness)
             
-            print(i, end=', ')
+            # print(i, end=', ')
         
         fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
-        print(num_generaciones)
+        # print(num_generaciones)
         
         self.update_stats(individuos, fitness)
-        self.fitness_apriori.append(calcula_fitness([[]], datosTrain, representacion, apriori))
+        self.fitness_apriori = (calcula_fitness([[]], datosTrain, representacion, apriori))[0]
         
         self.stats = np.array(self.stats)
         self.mejor_individuo = self.mejores_individuos[-1]
@@ -64,7 +64,7 @@ class ClasificadorAG(Clasificador):
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
         clasificacion = []
         
-        for dato in datosTest:
+        for dato in discretiza(datosTest, self.k):
             clase = devuelve_clase(self.mejor_individuo, dato, self.representacion, self.apriori)
             clasificacion.append(clase)
         
