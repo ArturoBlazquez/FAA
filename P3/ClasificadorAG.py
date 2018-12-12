@@ -18,8 +18,12 @@ MUTACION_PORCENTAJE_DE_INDIVIDUOS = 1
 class ClasificadorAG(Clasificador):
     def __init__(self, k=0):
         self.k = k
-        self.individuo = []
+        self.mejor_individuo = []
+        self.mejores_individuos = []
         self.stats = []
+        self.fitness_apriori = []
+        self.representacion = 0
+        self.apriori = 0
         super().__init__()
     
     def entrenamiento(self, datosTrain, atributosDiscretos, diccionario, num_individuos=100, min_reglas=1,
@@ -33,6 +37,7 @@ class ClasificadorAG(Clasificador):
         individuos = genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion,
                                               tasa_ceros)
         
+        print("Generación:", end=' ')
         for i in range(num_generaciones):
             fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
             self.update_stats(individuos, fitness)
@@ -41,16 +46,27 @@ class ClasificadorAG(Clasificador):
             
             mutacion(hijos, prob_mutacion, k, representacion, tipo_mutacion)
             
-            individuos = seleccion_de_supervivientes(individuos, hijos)
+            individuos = seleccion_de_supervivientes(individuos, hijos, fitness)
+            
+            print(i, end=', ')
         
         fitness = calcula_fitness(individuos, discretiza(datosTrain, k), representacion, apriori)
-        self.update_stats(individuos, fitness)
-        self.stats.append(calcula_fitness([[]], datosTrain, representacion, apriori)[0])  # Append apriori fitness
+        print(num_generaciones)
         
-        self.individuo = self.stats[-2][1]
+        self.update_stats(individuos, fitness)
+        self.fitness_apriori.append(calcula_fitness([[]], datosTrain, representacion, apriori))
+        
+        self.stats = np.array(self.stats)
+        self.mejor_individuo = self.mejores_individuos[-1]
+        self.apriori = apriori
+        self.representacion = representacion
     
     def clasifica(self, datosTest, atributosDiscretos, diccionario):
         clasificacion = []
+        
+        for dato in datosTest:
+            clase = devuelve_clase(self.mejor_individuo, dato, self.representacion, self.apriori)
+            clasificacion.append(clase)
         
         return np.array(clasificacion)
     
@@ -58,7 +74,8 @@ class ClasificadorAG(Clasificador):
         mejor_individuo = individuos[fitness.index(max(fitness))]
         fitness_medio = sum(fitness) / len(individuos)
         
-        self.stats.append([fitness_medio, mejor_individuo, max(fitness)])
+        self.stats.append([fitness_medio, max(fitness)])
+        self.mejores_individuos.append(mejor_individuo)
 
 
 def genera_poblacion_inicial(num_individuos, min_reglas, max_reglas, num_atributos, k, representacion, tasa_ceros):
@@ -208,8 +225,11 @@ def mutacion(individuos, prob_mutacion, k, representacion, tipo_mutacion):
                             individuos[i][r][g] = getrandbits(k)
 
 
-def seleccion_de_supervivientes(individuos, hijos):
-    return individuos[:10] + hijos[10:]
+def seleccion_de_supervivientes(individuos, hijos, fitness, num_padres=10):
+    index_mejores_padres = np.array(fitness).argsort()[-num_padres:][::-1]
+    mejores_padres = np.array(individuos)[index_mejores_padres].tolist()
+    
+    return mejores_padres + hijos[num_padres:]
 
 
 def clase_mas_frecuente(lst):
